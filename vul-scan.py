@@ -18,27 +18,6 @@ mutex = threading.Lock()	#线程互斥锁
 class TimeoutError(Exception):
 	pass
 
-class Watcher:
-	def __init__(self):
-		self.child = os.fork()
-		if self.child == 0:
-			return
-		else:
-			self.watch()
-	
-	def watch(self):
-		try:
-			os.wait()
-		except KeyboardInterrupt:
-			self.kill()
-		sys.exit()
-
-	def kill(self):
-		try:
-			os.kill(self.child, signal.SIGKILL)
-		except OSError:
-			pass
-
 def domain2ip(domain):
 	return socket.getaddrinfo(domain, None)[0][4][0]
 
@@ -189,6 +168,7 @@ def scanning(host,port):
 	for script in scripts:
 		if mutex.acquire():
 			thread = threading.Thread(target=script, args=(host, port,))
+			thread.setDaemon(True)
 			thread.start()
 			mutex.release()
 			threads.append(thread)
