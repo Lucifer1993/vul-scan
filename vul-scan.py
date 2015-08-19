@@ -188,7 +188,6 @@ def scanning(host,port):
 	#指定多线程
 	for script in scripts:
 		if mutex.acquire():
-			Watcher()
 			thread = threading.Thread(target=script, args=(host, port,))
 			thread.start()
 			mutex.release()
